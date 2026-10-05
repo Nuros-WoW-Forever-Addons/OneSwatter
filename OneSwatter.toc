@@ -1,0 +1,11 @@
+## Interface: 16001, 11200, 20400, 30300
+## Title: OneSwatter
+## Notes: Error capture, debug logging, and diagnostic tool for OneSuite addons and WoW UI development.
+## Author: Antigravity
+## Version: 1.0.0
+## IconTexture: Interface\AddOns\OneSwatter\Textures\SwatterIcon
+## SavedVariables: OneSwatterDB
+## OptionalDeps: OnePanelUtils, SlideBar
+
+OneSwatter.lua
+OneSwatterUI.lua
