@@ -218,7 +218,7 @@ function UI:InitErrorsTab()
 
     -- Auto-Show Checkbox
     local autoCb = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
-    autoCb:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -10, 2)
+    autoCb:SetPoint("LEFT", copyBtn, "RIGHT", 16, -1)
     autoCb.text = autoCb:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     autoCb.text:SetPoint("LEFT", autoCb, "RIGHT", 4, 0)
     autoCb.text:SetText("Auto-Show UI")
