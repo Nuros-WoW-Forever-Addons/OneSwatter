@@ -136,6 +136,27 @@ function UI:Init()
     self:InitDebugLogsTab()
     self:InitSettingsTab()
 
+    -- Master Reload UI Button at bottom right
+    local reloadBtn = CreateButton(frame, "Reload UI", 100, 22, function()
+        if ReloadUI then
+            ReloadUI()
+        elseif ConsoleExec then
+            ConsoleExec("reloadui")
+        end
+    end)
+    reloadBtn:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -16, 10)
+
+    -- MouseOver Tooltip
+    reloadBtn:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_TOPRIGHT")
+        GameTooltip:SetText("Reload UI", 1, 1, 1)
+        GameTooltip:AddLine("Reloads the WoW User Interface.\n\n|cffffcc00Note:|r You must reload the UI (or log out) for newly captured errors and debug logs to be written to disk in SavedVariables.", 1, 0.82, 0, true)
+        GameTooltip:Show()
+    end)
+    reloadBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
     self:SelectTab(1)
 end
 
@@ -146,7 +167,7 @@ end
 function UI:InitErrorsTab()
     local panel = CreateFrame("Frame", nil, self.frame)
     panel:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 16, -76)
-    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 16)
+    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 38)
     self.errorsPanel = panel
 
     -- Header Info
@@ -197,7 +218,7 @@ function UI:InitErrorsTab()
 
     -- Auto-Show Checkbox
     local autoCb = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
-    autoCb:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -150, 2)
+    autoCb:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -10, 2)
     autoCb.text = autoCb:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     autoCb.text:SetPoint("LEFT", autoCb, "RIGHT", 4, 0)
     autoCb.text:SetText("Auto-Show UI")
@@ -280,7 +301,7 @@ end
 function UI:InitDebugLogsTab()
     local panel = CreateFrame("Frame", nil, self.frame)
     panel:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 16, -76)
-    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 16)
+    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 38)
     self.debugPanel = panel
 
     -- Filter Bar (Addon selector, Debug Mode Checkbox, Level Selector, Search Box)
@@ -472,7 +493,7 @@ end
 function UI:InitSettingsTab()
     local panel = CreateFrame("Frame", nil, self.frame)
     panel:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 16, -76)
-    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 16)
+    panel:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -16, 38)
     self.settingsPanel = panel
 
     -- General Settings Header
