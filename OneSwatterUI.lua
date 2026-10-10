@@ -131,6 +131,23 @@ function UI:Init()
     self.tabs[3] = CreateTabButton(tabContainer, 3, "Settings & Suite", function(id) self:SelectTab(id) end)
     self.tabs[3]:SetPoint("LEFT", self.tabs[2], "RIGHT", 6, 0)
 
+    -- Top Frame Nudger Launch Button
+    local topNudgerBtn = CreateButton(tabContainer, "🎯 Frame Nudger", 120, 24, function()
+        if OneSwatter.Nudger then
+            OneSwatter.Nudger:Toggle()
+        end
+    end)
+    topNudgerBtn:SetPoint("RIGHT", tabContainer, "RIGHT", 0, 0)
+    topNudgerBtn:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_TOPRIGHT")
+        GameTooltip:SetText("Frame Nudger", 1, 1, 1)
+        GameTooltip:AddLine("Opens the popout Frame Nudger HUD for pixel-precise element alignment, sizing, and code generation.", 1, 0.82, 0, true)
+        GameTooltip:Show()
+    end)
+    topNudgerBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
     -- Main Content Area Panels
     self:InitErrorsTab()
     self:InitDebugLogsTab()
