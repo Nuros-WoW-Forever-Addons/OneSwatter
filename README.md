@@ -16,6 +16,12 @@ It modernizes and extends the classic `!Swatter` addon, providing both unhandled
   - **Errors Tab**: Inspect captured Lua errors, cycle with `< Prev` / `Next >`, auto-select all text for 1-click copy-pasting into bug reports or IDEs.
   - **Debug Logs Tab**: Live filtering by Addon and Log Level (`DEBUG`, `INFO`, `WARN`, `ERROR`), live text search, and toggle debug mode on the fly per addon.
   - **Settings Tab**: Master checklist to toggle Debug Mode for every `OneXXX` addon from a single window.
+- **Popout Frame Nudger HUD (`/oneswat nudge`)**:
+  - Compact, draggable floating micro-inspector.
+  - **Mouse-Over Element Picker**: Highlights elements with a green outline and locks onto the selected target on click.
+  - **4-Way Cross D-Pad**: Move elements pixel-by-pixel (1px, 5px, 10px) with center Reset (↺) button.
+  - **Dynamic Sizing Control**: Uniform sizing (Up / Reset / Down) by default, or independent Width (◄ ↺ ►) & Height (▲ ↺ ▼) controls via checkbox.
+  - **Live Code Generator**: Generates clean `SetPoint` and `SetSize` Lua snippets with 1-click select/copy.
 - **Seamless `OnePanelUtils` Integration**: Automatically hooks into `OnePanelUtils.Logger` so existing suite log calls stream directly into `OneSwatter`.
 
 ---
@@ -69,11 +75,13 @@ _G.OneSwatter:Log("OnePanel", "DEBUG", "TabManager", "Switching active tab to Pr
 | Command | Action |
 | :--- | :--- |
 | `/oneswatter` or `/oneswat` or `/swat` | Toggle the OneSwatter diagnostic window |
+| `/oneswat nudge` | Toggle the popout Frame Nudger HUD |
 | `/oneswat enable` / `/oneswat disable` | Enable or disable global error catching & logging |
 | `/oneswat autoshow` | Toggle automatic window popup when an error occurs |
 | `/oneswat debug <Addon> [on\|off]` | Enable, disable, or toggle debug mode for a suite addon |
 | `/oneswat debuglist` | List all registered suite addons and their debug status |
 | `/oneswat clear` | Clear all recorded errors and debug logs |
+| `/oneswat help` | Display in-game command assistance |
 
 ---
 
@@ -84,6 +92,7 @@ OneSwatter/
 ├── OneSwatter.toc       # Addon manifest
 ├── OneSwatter.lua       # Core error handler, debug logging API, table serializer, slash commands
 ├── OneSwatterUI.lua     # Dual-tab UI frame (Errors, Debug Logs, Settings)
+├── OneSwatterNudger.lua # Popout Frame Nudger HUD (D-Pad, sizing controls, picker)
 ├── Textures/
 │   └── SwatterIcon.blp  # OneSwatter launcher icon
 └── README.md            # Documentation

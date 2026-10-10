@@ -157,6 +157,23 @@ function UI:Init()
         GameTooltip:Hide()
     end)
 
+    -- Master Frame Nudger Button
+    local nudgerBtn = CreateButton(frame, "Frame Nudger", 100, 22, function()
+        if OneSwatter.Nudger then
+            OneSwatter.Nudger:Toggle()
+        end
+    end)
+    nudgerBtn:SetPoint("RIGHT", reloadBtn, "LEFT", -8, 0)
+    nudgerBtn:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_TOPRIGHT")
+        GameTooltip:SetText("Frame Nudger", 1, 1, 1)
+        GameTooltip:AddLine("Opens the popout Frame Nudger HUD for pixel-precise element alignment, sizing, and code generation.", 1, 0.82, 0, true)
+        GameTooltip:Show()
+    end)
+    nudgerBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
     self:SelectTab(1)
 end
 

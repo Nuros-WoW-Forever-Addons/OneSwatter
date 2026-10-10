@@ -472,6 +472,10 @@ SlashCmdList["ONESWATTER"] = function(msg)
             local statusStr = isEnabled and "|cff00ff00ENABLED|r" or "|cff808080DISABLED|r"
             DEFAULT_CHAT_FRAME:AddMessage("  - " .. addon .. ": " .. statusStr)
         end
+    elseif cmd == "nudge" then
+        if OneSwatter.Nudger then
+            OneSwatter.Nudger:Toggle()
+        end
     elseif cmd == "clear" then
         OneSwatterDB.errors = {}
         OneSwatterDB.debugLogs = {}
@@ -479,14 +483,18 @@ SlashCmdList["ONESWATTER"] = function(msg)
         if OneSwatter.UI and OneSwatter.UI.frame and OneSwatter.UI.frame:IsShown() then
             OneSwatter.UI:RefreshAll()
         end
-    else
-        OneSwatter:Print("Commands:")
+    elseif cmd == "help" then
+        OneSwatter:Print("Available Commands:")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat                 - Toggle OneSwatter window")
+        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat nudge           - Toggle popout Frame Nudger HUD")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat enable|disable  - Enable or disable error capture")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat autoshow        - Toggle automatic UI popup on error")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat debug <Addon>  - Toggle debug mode for a suite addon")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat debuglist      - View debug status for all registered addons")
         DEFAULT_CHAT_FRAME:AddMessage("  /oneswat clear          - Clear all recorded errors & logs")
+        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat help           - Display this help information")
+    else
+        OneSwatter:Print("Unknown command '" .. cmd .. "'. Type |cff00ccff/oneswat help|r for available commands.")
     end
 end
 
