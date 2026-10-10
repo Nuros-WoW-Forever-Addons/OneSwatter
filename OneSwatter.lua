@@ -304,6 +304,7 @@ function OneSwatter.OnError(msg, frame, stack, etype, ...)
         local errObj = table.remove(OneSwatterDB.errors, existingIndex)
         errObj.count = (errObj.count or 1) + 1
         errObj.lastSeen = timestamp
+        errObj.stack = stack
         table.insert(OneSwatterDB.errors, errObj) -- Push to end (most recent)
     else
         local newErr = {
