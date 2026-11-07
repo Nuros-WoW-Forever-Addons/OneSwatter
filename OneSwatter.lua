@@ -11,7 +11,7 @@ _G.OneSwatter = _G.OneSwatter or addonTable
 local OneSwatter = _G.OneSwatter
 
 OneSwatter.name = addonName
-OneSwatter.version = "1.0.0"
+OneSwatter.version = "1.0.1"
 OneSwatter.origHandler = geterrorhandler()
 OneSwatter.origItemRef = SetItemRef
 OneSwatter.HISTORY_SIZE_DEFAULT = 50
@@ -338,10 +338,16 @@ function OneSwatter.OnError(msg, frame, stack, etype, ...)
             OneSwatter.UI:ShowError(errId)
         end
     else
-        DEFAULT_CHAT_FRAME:AddMessage(string.format(
+        local frame = OneSwatter.GetChatFrame and OneSwatter.GetChatFrame() or DEFAULT_CHAT_FRAME
+        local text = string.format(
             "|cffffcc00[OneSwatter]|r |cffff3333Error caught in [%s]:|r |Honeswatter:%d|h|cff00ccff[Click to View #%d]|r|h",
             context, errId, errId
-        ))
+        )
+        if frame and frame.AddMessage then
+            frame:AddMessage(text)
+        elseif DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage(text)
+        end
     end
 end
 
@@ -368,6 +374,7 @@ end
 
 local eventFrame = CreateFrame("Frame", "OneSwatter_EventFrame")
 eventFrame:RegisterEvent("ADDON_LOADED")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:RegisterEvent("ADDON_ACTION_BLOCKED")
 eventFrame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 
@@ -407,8 +414,19 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
             end
         end
 
-        OneSwatter:Print("v" .. OneSwatter.version .. " loaded. Ready to catch errors and debug details.")
         self:UnregisterEvent("ADDON_LOADED")
+
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        if not OneSwatter.welcomePrinted then
+            OneSwatter.welcomePrinted = true
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0.4, function()
+                    OneSwatter:Print("v" .. OneSwatter.version .. " loaded. Ready to catch errors and debug details.")
+                end)
+            else
+                OneSwatter:Print("v" .. OneSwatter.version .. " loaded. Ready to catch errors and debug details.")
+            end
+        end
 
     elseif event == "ADDON_ACTION_BLOCKED" then
         local addon, func = arg1, arg2
@@ -426,8 +444,60 @@ end)
 -- Helper Utility Methods & Slash Commands
 -------------------------------------------------------------------------------
 
+-- Print helper routing to 'OneAddon' chat tab
+local function GetOneAddonChatFrame()
+    local targetName = "OneAddon"
+    for i = 1, (NUM_CHAT_WINDOWS or 10) do
+        local name = GetChatWindowInfo(i)
+        if name == targetName then
+            local cf = _G["ChatFrame" .. i]
+            if cf then
+                local tab = _G["ChatFrame" .. i .. "Tab"]
+                if tab then
+                    tab:Show()
+                    if PanelTemplates_TabResize then
+                        pcall(PanelTemplates_TabResize, tab, 0)
+                    end
+                end
+                return cf
+            end
+        end
+    end
+    if FCF_OpenNewWindow then
+        local frame = FCF_OpenNewWindow(targetName)
+        if frame then
+            if FCF_DockFrame and GENERAL_CHAT_DOCK then
+                local docked = (FCFDock_GetChatFrames and FCFDock_GetChatFrames(GENERAL_CHAT_DOCK)) or (GENERAL_CHAT_DOCK and GENERAL_CHAT_DOCK.DOCKED_CHAT_FRAMES) or {}
+                pcall(FCF_DockFrame, frame, #docked + 1, false)
+            end
+            if ChatFrame_RemoveAllMessageGroups then pcall(ChatFrame_RemoveAllMessageGroups, frame) end
+            if ChatFrame_RemoveAllChannels then pcall(ChatFrame_RemoveAllChannels, frame) end
+            if FCF_DockUpdate then pcall(FCF_DockUpdate) end
+            local id = frame.GetID and frame:GetID()
+            if id then
+                local tab = _G["ChatFrame" .. id .. "Tab"]
+                if tab then
+                    tab:Show()
+                    if PanelTemplates_TabResize then pcall(PanelTemplates_TabResize, tab, 0) end
+                end
+            end
+            if FCF_SelectDockFrame and DEFAULT_CHAT_FRAME then pcall(FCF_SelectDockFrame, DEFAULT_CHAT_FRAME) end
+            return frame
+        end
+    end
+    return DEFAULT_CHAT_FRAME or ChatFrame1
+end
+OneSwatter.GetChatFrame = GetOneAddonChatFrame
+
 function OneSwatter:Print(msg)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff00ccff[OneSwatter]|r " .. tostring(msg))
+    local frame = GetOneAddonChatFrame()
+    local prefix = "|cff00ccff[OneSwatter]|r "
+    local text = prefix .. tostring(msg)
+    if frame and frame.AddMessage then
+        frame:AddMessage(text)
+    elseif DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(text)
+    end
 end
 
 SLASH_ONESWATTER1 = "/oneswatter"
@@ -471,7 +541,7 @@ SlashCmdList["ONESWATTER"] = function(msg)
         for addon in pairs(OneSwatterDB.registeredAddons or {}) do
             local isEnabled = OneSwatter:IsDebugMode(addon)
             local statusStr = isEnabled and "|cff00ff00ENABLED|r" or "|cff808080DISABLED|r"
-            DEFAULT_CHAT_FRAME:AddMessage("  - " .. addon .. ": " .. statusStr)
+            OneSwatter:Print("  - " .. addon .. ": " .. statusStr)
         end
     elseif cmd == "nudge" then
         if OneSwatter.Nudger then
@@ -486,14 +556,14 @@ SlashCmdList["ONESWATTER"] = function(msg)
         end
     elseif cmd == "help" then
         OneSwatter:Print("Available Commands:")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat                 - Toggle OneSwatter window")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat nudge           - Toggle popout Frame Nudger HUD")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat enable|disable  - Enable or disable error capture")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat autoshow        - Toggle automatic UI popup on error")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat debug <Addon>  - Toggle debug mode for a suite addon")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat debuglist      - View debug status for all registered addons")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat clear          - Clear all recorded errors & logs")
-        DEFAULT_CHAT_FRAME:AddMessage("  /oneswat help           - Display this help information")
+        OneSwatter:Print("  /oneswat                 - Toggle OneSwatter window")
+        OneSwatter:Print("  /oneswat nudge           - Toggle popout Frame Nudger HUD")
+        OneSwatter:Print("  /oneswat enable|disable  - Enable or disable error capture")
+        OneSwatter:Print("  /oneswat autoshow        - Toggle automatic UI popup on error")
+        OneSwatter:Print("  /oneswat debug <Addon>  - Toggle debug mode for a suite addon")
+        OneSwatter:Print("  /oneswat debuglist      - View debug status for all registered addons")
+        OneSwatter:Print("  /oneswat clear          - Clear all recorded errors & logs")
+        OneSwatter:Print("  /oneswat help           - Display this help information")
     else
         OneSwatter:Print("Unknown command '" .. cmd .. "'. Type |cff00ccff/oneswat help|r for available commands.")
     end
